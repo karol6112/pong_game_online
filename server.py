@@ -2,30 +2,35 @@ import socket
 import threading
 
 SIZE = 1024
-HOST = "127.0.0.1"
 PORT = 6240
 
+HOST = "127.0.0.1"
 FORMAT = 'utf-8'
 
 
-def handle_client(conn, addr):
+def handle_client(conn, addr, num_of_clients):
     print(f"[NEW CONNECTION {addr} connected.")
-
     connected = True
     while connected:
+        if num_of_clients > 2:
+            conn.send("stop".encode(FORMAT))
+            connected = False
+
         message = conn.recv(SIZE).decode(FORMAT)
         if message == "stop":
             connected = False
 
-        print(f"[{addr}] {message}")
-        conn.send("Message send".encode(FORMAT))
 
+        print(f"[{addr}] {message}")
+        message_to_send = "XXX"
+        conn.send(message_to_send.encode(FORMAT))
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     server.bind((HOST, PORT))
     server.listen()
     while True:
         conn, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        num_of_clients = threading.activeCount()
+        thread = threading.Thread(target=handle_client, args=(conn, addr, num_of_clients))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
