@@ -15,6 +15,7 @@ def handle_client(conn, addr, num_of_clients):
         if num_of_clients > 2:
             conn.send("stop".encode(FORMAT))
             connected = False
+            continue
 
         message = conn.recv(SIZE).decode(FORMAT)
         if message == "stop":
