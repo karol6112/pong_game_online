@@ -34,7 +34,7 @@ class Player():
             else:
                 self.x += self.velocity
 
-            self.update()
+        self.update()
         
     def update(self):
         self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -72,9 +72,10 @@ def redraw_window(screen, player):
     pygame.display.update()
 
 
-# test
-main_game()
 
+
+
+main_game()
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
