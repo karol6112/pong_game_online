@@ -12,10 +12,6 @@ def handle_client(conn, addr, client_number):
     print(f"[NEW CONNECTION {addr} connected.")
     connected = True
     while connected:
-        # if client_number > 2:
-        #     conn.send("stop".encode(FORMAT))
-        #     connected = False
-        #     continue
 
         message = conn.recv(SIZE).decode(FORMAT)
         if message == "stop":
