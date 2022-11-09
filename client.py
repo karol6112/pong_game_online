@@ -39,6 +39,9 @@ class Player():
     def update(self):
         self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
 
+    def get_pos(self):
+        return self.x, self.y
+
 
 def send(client, mes):
     message = mes.encode(FORMAT)
@@ -53,42 +56,61 @@ def main_game():
     screen = pygame.display.set_mode((WIN_SIZE, WIN_SIZE))
 
     player = Player(50, 50, 200, 50, (0, 0, 0))
+    player2 = Player(300, 300, 200, 50, (255, 0, 0))
+
+    client.send("initializing".encode(FORMAT))
+    cord = client.recv(1024).decode(FORMAT)
+    player.x, player.y = eval(cord)
+
     clock = pygame.time.Clock()
     running = True
     while running:
         clock.tick(60)
+
+        #pobieramy kordy gracza i wysylamy na server
+        pos = player.get_pos()
+        client.send(str(pos).encode(FORMAT))
+
+        #pobieramy kordy drugiego gracza 
+        p2pos = client.recv(1024).decode(FORMAT)
+
+        #aktualizujemy pozycje drugiego gracza 
+        player2.x, player2.y = eval(p2pos)
+        player2.update()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
                 quit()
         player.move(WIN_SIZE)
-        redraw_window(screen, player)
+        redraw_window(screen, player, player2)
 
 
-def redraw_window(screen, player):
+def redraw_window(screen, player, player2):
     screen.fill((255, 255, 255))
     player.draw(screen)
+    player2.draw(screen)
     pygame.display.update()
 
 
 
 
 
-main_game()
+
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
 
     run = True
     while run:
-        mes = "OK"
-        client.send(mes.encode(FORMAT))
+        #potem tutaj main_game()
+        #game start
+        main_game()
+        
 
         message = client.recv(1024).decode(FORMAT)
         print(message)
         if message == 'stop':
             break
 
-        if keyboard.read_key() == 'a':
-            client.send(mes.encode(FORMAT))
