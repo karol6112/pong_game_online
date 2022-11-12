@@ -8,6 +8,7 @@ HOST = "127.0.0.1"
 FORMAT = 'utf-8'
 
 players_pos = [(50,50), (300,300)]
+ball_position = (250, 250)
 
 def convert_message(message):
     message = message.strip("()")
@@ -17,26 +18,38 @@ def convert_message(message):
 def handle_client(conn, addr, client_number):
     print(f"[NEW CONNECTION {addr} connected.")
     connected = True
+    #player_cord
     conn.recv(1024).decode(FORMAT)
     conn.send(str(players_pos[client_number-1]).encode(FORMAT))
+    conn.recv(1024).decode(FORMAT)
+
+    #ball_cord
+    global ball_position
+    conn.send(str(ball_position).encode(FORMAT))
+
     while connected:
         #pobieramy kordy gracza
         message = conn.recv(SIZE).decode(FORMAT)
 
-        if message == "stop":
-            connected = False
-
+        # if message == "stop":
+        #     connected = False
         #print(players_pos[client_number-1])
         #print(convert_message(message))
+
         players_pos[client_number-1] = convert_message(message)
+
         #jezeli gracz 1 to
         if client_number == 2:
             conn.send(str(players_pos[0]).encode(FORMAT))
         else:
             conn.send(str(players_pos[1]).encode(FORMAT))
-        
 
-        
+        #polozenie pilki
+        message = conn.recv(SIZE).decode(FORMAT)
+        ball_position = convert_message(message)
+        print(ball_position)
+        conn.send(str(ball_position).encode(FORMAT))
+
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
     server.bind((HOST, PORT))
