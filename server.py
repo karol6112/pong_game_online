@@ -32,12 +32,12 @@ def handle_client(conn, addr, client_number):
     global ball_position
     conn.send(str(ball_position).encode(FORMAT))
 
-    # while True:
-    #     if (threading.active_count() -1) == 2:
-    #         connected = True
-    #         time.sleep(1)
-    #         break
-    connected = True
+    while True:
+        if (threading.active_count() -1) == 2:
+            connected = True
+            time.sleep(1)
+            break
+    # connected = True
 
     while connected:
         #pobieramy kordy gracza

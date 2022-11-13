@@ -40,47 +40,44 @@ class Ball():
         return self.x, self.y
 
     def draw_ball(self):
-        pygame.draw.circle(screen, self.color, (self.shape), self.radius)
+        return pygame.draw.circle(screen, self.color, (self.shape), self.radius)
 
-    #testowo klawiszse
     def ball_movement(self):
-
-
         self.x += self.velocity_x
         self.y += self.velocity_y
-
-        # keys = pygame.key.get_pressed()
-
-        # if keys[pygame.K_w]:
-        #     self.y -= self.velocity_y
-        #
-        # if keys[pygame.K_s]:
-        #     self.y += self.velocity_y
-
         self.update()
 
     def update(self):
         self.shape = (self.x, self.y)
 
+    def check_position(self, player, player2):
+        if player.shape.colliderect(self.draw_ball()):  # and self.x in range(0, PLAYER_WIDTH):
+            self.velocity_x *= -1
+            self.step += 1
+        elif player2.shape.colliderect(self.draw_ball()):  # and self.x in range (WIDTH - PLAYER_WIDTH, WIDTH):
+            self.velocity_x *= -1
+            self.step += 1
 
+        if self.x == 0 or self.x < 0:
+            player.points += 1
+            self.x = WIDTH / 2
+            self.y = HEIGHT / 2
+            self.velocity_x = BALL_VEL
+            self.velocity_y = BALL_VEL
+            pygame.time.delay(2000)
 
+        elif self.x == WIDTH or self.x > WIDTH:
+            player2.points += 1
+            self.x = WIDTH / 2
+            self.y = HEIGHT / 2
+            self.velocity_x = BALL_VEL
+            self.velocity_y = BALL_VEL
+            pygame.time.delay(2000)
 
-# class Player():
-#
-#
-#
-#     def movement(self, key):
-#         if key[pygame.K_w] and player_a.rect.y - VEL > 0 - 5:
-#             player_a.rect.y -= VEL
-#
-#         if key[pygame.K_s] and player_a.rect.y + VEL < HEIGHT - PLAYER_HEIGHT + 5:
-#             player_a.rect.y += VEL
-#
-#         if key[pygame.K_PAGEUP] and player_b.rect.y - VEL > 0 - 5:
-#             player_b.rect.y -= VEL
-#
-#         if key[pygame.K_PAGEDOWN] and player_b.rect.y + VEL < HEIGHT - PLAYER_HEIGHT + 5:
-#             player_b.rect.y += VEL
+        if self.y <= 0:
+            self.velocity_y *= -1
+        elif self.y >= HEIGHT:
+            self.velocity_y *= -1
 
 
 class Player():
@@ -132,9 +129,6 @@ def main_game():
 
     player = Player(0, 0, (BLACK))
     player2 = Player(WIDTH - PLAYER_WIDTH, 500, (RED))
-
-    # player = Player(0, 0, 200, 50, (0, 0, 0))
-    # player2 = Player(WIN_SIZE-100, 0, 200, 50, (255, 0, 0))
     ball = Ball()
 
     client.send("initializing".encode(FORMAT))
@@ -166,6 +160,7 @@ def main_game():
 
         ball_pos = client.recv(1024).decode(FORMAT)
         ball.x, ball.y = eval(ball_pos)
+        ball.check_position(player, player2)
 
         player2.update()
         ball.update()
