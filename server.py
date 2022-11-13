@@ -1,23 +1,28 @@
 import socket
 import threading
+import time
 
 SIZE = 1024
-PORT = 6240
+PORT = 5555
 
 HOST = "127.0.0.1"
 FORMAT = 'utf-8'
 
-players_pos = [(50,50), (300,300)]
-ball_position = (250, 250)
+
+players_pos = [(0,0), (890,0)]
+ball_position = (450, 250)
+
+
 
 def convert_message(message):
     message = message.strip("()")
     message = message.split(",")
     return (int(message[0]), int(message[1]))
 
+
 def handle_client(conn, addr, client_number):
     print(f"[NEW CONNECTION {addr} connected.")
-    connected = True
+    # connected = True
     #player_cord
     conn.recv(1024).decode(FORMAT)
     conn.send(str(players_pos[client_number-1]).encode(FORMAT))
@@ -26,6 +31,13 @@ def handle_client(conn, addr, client_number):
     #ball_cord
     global ball_position
     conn.send(str(ball_position).encode(FORMAT))
+
+    # while True:
+    #     if (threading.active_count() -1) == 2:
+    #         connected = True
+    #         time.sleep(1)
+    #         break
+    connected = True
 
     while connected:
         #pobieramy kordy gracza
