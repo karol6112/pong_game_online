@@ -58,26 +58,29 @@ class Ball():
             self.velocity_x *= -1
             self.step += 1
 
-        if self.x == 0 or self.x < 0:
+        if self.x <= 0:
             player.points += 1
-            self.x = WIDTH / 2
-            self.y = HEIGHT / 2
+            self.x = int(WIDTH / 2)
+            self.y = int(HEIGHT / 2)
             self.velocity_x = BALL_VEL
             self.velocity_y = BALL_VEL
+            self.update()
             pygame.time.delay(2000)
 
-        elif self.x == WIDTH or self.x > WIDTH:
+        elif self.x >= WIDTH:
             player2.points += 1
-            self.x = WIDTH / 2
-            self.y = HEIGHT / 2
+            self.x = int(WIDTH / 2)
+            self.y = int(HEIGHT / 2)
             self.velocity_x = BALL_VEL
             self.velocity_y = BALL_VEL
+            self.update()
             pygame.time.delay(2000)
 
         if self.y <= 0:
             self.velocity_y *= -1
         elif self.y >= HEIGHT:
             self.velocity_y *= -1
+
 
 
 class Player():
