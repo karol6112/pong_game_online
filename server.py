@@ -5,9 +5,10 @@ import time
 SIZE = 1024
 PORT = 5555
 
-HOST = "127.0.0.1"
+HOST = "localhost"
 FORMAT = 'utf-8'
 
+print(socket.gethostbyname(socket.gethostname()))
 
 players_pos = [(0,0), (890,0)]
 ball_position = (450, 250)
@@ -42,11 +43,6 @@ def handle_client(conn, addr, client_number):
     while connected:
         #pobieramy kordy gracza
         message = conn.recv(SIZE).decode(FORMAT)
-
-        # if message == "stop":
-        #     connected = False
-        #print(players_pos[client_number-1])
-        #print(convert_message(message))
 
         players_pos[client_number-1] = convert_message(message)
 

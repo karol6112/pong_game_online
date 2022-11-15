@@ -1,10 +1,14 @@
 import socket
 import pygame
 
+pygame.init()
+
+
 SIZE = 1024
 FORMAT = "utf-8"
-HOST = "127.0.0.1"
+HOST = "localhost"
 PORT = 5555
+
 
 
 WIDTH, HEIGHT = 900, 500
@@ -18,9 +22,10 @@ VEL = 20
 BALL_VEL = 1
 PLAYER_HEIGHT = 100
 PLAYER_WIDTH = 10
+RESULT_FONT = pygame.font.SysFont('arial', 30)
+WIN_FONT = pygame.font.SysFont('arial', 100)
 
 
-pygame.init()
 pygame.display.set_caption("Game")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -59,7 +64,7 @@ class Ball():
             self.step += 1
 
         if self.x <= 0:
-            player.points += 1
+            player2.points += 1
             self.x = int(WIDTH / 2)
             self.y = int(HEIGHT / 2)
             self.velocity_x = BALL_VEL
@@ -68,7 +73,7 @@ class Ball():
             pygame.time.delay(2000)
 
         elif self.x >= WIDTH:
-            player2.points += 1
+            player.points += 1
             self.x = int(WIDTH / 2)
             self.y = int(HEIGHT / 2)
             self.velocity_x = BALL_VEL
@@ -100,11 +105,13 @@ class Player():
 
     def move(self, HEIGHT):
         keys = pygame.key.get_pressed()
+
         if keys[pygame.K_UP]:
             if self.y <= 0:
                 self.y = 0
             else:
                 self.y -= self.velocity
+
         if keys[pygame.K_DOWN]:
             if self.y >= HEIGHT - self.height:
                 self.y = HEIGHT - self.height
@@ -124,9 +131,6 @@ class Player():
 #     message = mes.encode(FORMAT)
 #     client.send(message)
 #     print(client.recv(1024).decode(FORMAT))
-
-
-
 
 def main_game():
 
@@ -165,6 +169,7 @@ def main_game():
         ball.x, ball.y = eval(ball_pos)
         ball.check_position(player, player2)
 
+        check_result(player, player2)
         player2.update()
         ball.update()
 
@@ -180,16 +185,46 @@ def main_game():
         redraw_window(screen, player, player2, ball)
 
 
+
 def redraw_window(screen, player, player2, ball):
     screen.fill((255, 255, 255))
     player.draw(screen)
     player2.draw(screen)
     ball.draw_ball()
+    border = pygame.Rect(WIDTH / 2 - 1, 0, 2, HEIGHT)
+    pygame.draw.rect(screen, BLACK, border)
+
+
+    player_results_text = RESULT_FONT.render("Points: " + str(player.points), 1, BLACK)
+    player2_results_text = RESULT_FONT.render("Points: " + str(player2.points), 1, BLACK)
+
+    speed = RESULT_FONT.render("Speed: " + str(abs(ball.velocity_y)), 1, BLUE)
+
+    screen.blit(player_results_text, (10, 10))
+    screen.blit(player2_results_text, (WIDTH - player2_results_text.get_width() - 10, 10))
+    screen.blit(speed, (WIDTH / 2 + 10, 10))
+
     pygame.display.update()
 
 
+def check_result(player, player2):
+    if player.points == 2:
+        player_a_win_text = WIN_FONT.render("Player A WIN!!!", 1, RED)
+        screen.blit(player_a_win_text,
+                    (WIDTH / 2 - player_a_win_text.get_width() / 2, HEIGHT / 2 - player_a_win_text.get_height() / 2))
+        pygame.display.update()
+        pygame.time.delay(2000)
+        player.points = 0
+        player2.points = 0
 
-
+    elif player2.points == 2:
+        player_b_win_text = WIN_FONT.render("Player B WIN!!!", 1, RED)
+        screen.blit(player_b_win_text,
+                    (WIDTH / 2 - player_b_win_text.get_width() / 2, HEIGHT / 2 - player_b_win_text.get_height() / 2))
+        pygame.display.update()
+        pygame.time.delay(2000)
+        player.points = 0
+        player2.points = 0
 
 
 
