@@ -3,13 +3,10 @@ import pygame
 
 pygame.init()
 
-
 SIZE = 1024
 FORMAT = "utf-8"
-HOST = "localhost"
-PORT = 5555
-
-
+HOST = "34.78.164.67"
+PORT = 3389
 
 WIDTH, HEIGHT = 900, 500
 WIN_SIZE = 500
@@ -19,21 +16,21 @@ RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 VEL = 20
-BALL_VEL = 1
+BALL_VEL = 10
 PLAYER_HEIGHT = 100
 PLAYER_WIDTH = 10
 RESULT_FONT = pygame.font.SysFont('arial', 30)
 WIN_FONT = pygame.font.SysFont('arial', 100)
 
-
 pygame.display.set_caption("Game")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
 
 class Ball():
 
     def __init__(self):
-        self.x = WIN_SIZE/2
-        self.y = WIN_SIZE/2
+        self.x = WIN_SIZE / 2
+        self.y = WIN_SIZE / 2
         self.color = BLUE
         self.radius = 10
         self.velocity_x = BALL_VEL
@@ -87,10 +84,9 @@ class Ball():
             self.velocity_y *= -1
 
 
-
 class Player():
 
-    def __init__(self,x, y, color):
+    def __init__(self, x, y, color):
         self.x = x
         self.y = y
         self.height = PLAYER_HEIGHT
@@ -119,7 +115,7 @@ class Player():
                 self.y += self.velocity
 
         self.update()
-        
+
     def update(self):
         self.shape = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -133,7 +129,6 @@ class Player():
 #     print(client.recv(1024).decode(FORMAT))
 
 def main_game():
-
     player = Player(0, 0, (BLACK))
     player2 = Player(WIDTH - PLAYER_WIDTH, 500, (RED))
     ball = Ball()
@@ -151,17 +146,17 @@ def main_game():
     while running:
         clock.tick(60)
 
-        #pobieramy kordy gracza i wysylamy na server
+        # pobieramy kordy gracza i wysylamy na server
         pos = player.get_pos()
         client.send(str(pos).encode(FORMAT))
 
-        #pobieramy kordy drugiego gracza
+        # pobieramy kordy drugiego gracza
         p2pos = client.recv(1024).decode(FORMAT)
 
-        #aktualizujemy pozycje drugiego gracza 
+        # aktualizujemy pozycje drugiego gracza
         player2.x, player2.y = eval(p2pos)
 
-        #ball
+        # ball
         ball_pos = ball.get_pos()
         client.send(str(ball_pos).encode(FORMAT))
 
@@ -172,7 +167,6 @@ def main_game():
         check_result(player, player2)
         player2.update()
         ball.update()
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -185,7 +179,6 @@ def main_game():
         redraw_window(screen, player, player2, ball)
 
 
-
 def redraw_window(screen, player, player2, ball):
     screen.fill((255, 255, 255))
     player.draw(screen)
@@ -194,15 +187,14 @@ def redraw_window(screen, player, player2, ball):
     border = pygame.Rect(WIDTH / 2 - 1, 0, 2, HEIGHT)
     pygame.draw.rect(screen, BLACK, border)
 
-
     player_results_text = RESULT_FONT.render("Points: " + str(player.points), 1, BLACK)
     player2_results_text = RESULT_FONT.render("Points: " + str(player2.points), 1, BLACK)
 
-    speed = RESULT_FONT.render("Speed: " + str(abs(ball.velocity_y)), 1, BLUE)
+    # speed = RESULT_FONT.render("Speed: " + str(abs(ball.velocity_y)), 1, BLUE)
 
     screen.blit(player_results_text, (10, 10))
     screen.blit(player2_results_text, (WIDTH - player2_results_text.get_width() - 10, 10))
-    screen.blit(speed, (WIDTH / 2 + 10, 10))
+    # screen.blit(speed, (WIDTH / 2 + 10, 10))
 
     pygame.display.update()
 
@@ -227,19 +219,16 @@ def check_result(player, player2):
         player2.points = 0
 
 
-
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client:
     client.connect((HOST, PORT))
 
     run = True
     while run:
-        #potem tutaj main_game()
-        #game start
+        # potem tutaj main_game()
+        # game start
         main_game()
-        
 
         message = client.recv(1024).decode(FORMAT)
         print(message)
         if message == 'stop':
             break
-
